@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum ProspectStatus {
+  NEW
+  NOT_HOME
+  INTERESTED
+  FOLLOW_UP
+  APPOINTMENT
+  SOLD
+  NOT_INTERESTED
+}
+
+enum FollowUpStatus {
+  PENDING
+  DONE
+  SNOOZED
+  CANCELED
+}
+
+enum FollowUpMethod {
+  IN_PERSON
+  PHONE
+  EMAIL
+  TEXT
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  prospects Prospect[]
+  notes     Note[]
+  followUps FollowUp[]
+}
+
+model Prospect {
+  id        String         @id @default(cuid())
+  ownerId   String
+  owner     User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name      String
+  address   String
+  city      String?
+  state     String?
+  zip       String?
+  phone     String?
+  email     String?
+  status    ProspectStatus @default(NEW)
+  tags      String? // comma-separated
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  notes     Note[]
+  followUps FollowUp[]
+
+  @@index([ownerId])
+  @@index([status])
+}
+
+model Note {
+  id         String   @id @default(cuid())
+  prospectId String
+  prospect   Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body       String
+  createdAt  DateTime @default(now())
+
+  followUps FollowUp[]
+
+  @@index([prospectId])
+}
+
+model FollowUp {
+  id          String         @id @default(cuid())
+  prospectId  String
+  prospect    Prospect       @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  noteId      String?
+  note        Note?          @relation(fields: [noteId], references: [id], onDelete: SetNull)
+  ownerId     String
+  owner       User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  dueAt       DateTime
+  label       String // e.g. "Come back in spring"
+  method      FollowUpMethod @default(IN_PERSON)
+  status      FollowUpStatus @default(PENDING)
+  completedAt DateTime?
+  createdAt   DateTime       @default(now())
+
+  @@index([ownerId, status, dueAt])
+  @@index([prospectId])
+}

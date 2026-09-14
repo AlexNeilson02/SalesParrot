@@ -1,0 +1,12 @@
+{
+  "name": "SalesParrot",
+  "short_name": "SalesParrot",
+  "description": "Door-to-door sales tracking with smart follow-up reminders",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#f7f8f5",
+  "theme_color": "#1f9d55",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
