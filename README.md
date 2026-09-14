@@ -68,6 +68,8 @@ Otherwise, use **Create an account** to register your own login.
 | `AUTH_SECRET`          | Secret used to sign session cookies. Generate one with `openssl rand -hex 32` and never commit it. |
 | `GEOCODER_URL`         | Optional. Geocoding endpoint, defaults to public Nominatim.                   |
 | `GEOCODER_USER_AGENT`  | Optional. Identifies your app to the geocoder, as Nominatim's policy requires. |
+| `NEXT_PUBLIC_MAP_TILE_URL` | Optional. Map tile template, defaults to OpenStreetMap.                   |
+| `NEXT_PUBLIC_MAP_TILE_ATTRIBUTION` | Optional. Attribution shown on the map.                           |
 
 ### A note on maps and geocoding
 

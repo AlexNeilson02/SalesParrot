@@ -6,6 +6,14 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { STATUS_META, type ProspectStatusKey } from "@/lib/status";
 
+// Defaults to OpenStreetMap. Point these at a commercial provider for a real
+// team — OSM's tile server is meant for light traffic.
+const TILE_URL =
+  process.env.NEXT_PUBLIC_MAP_TILE_URL || "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+const TILE_ATTRIBUTION =
+  process.env.NEXT_PUBLIC_MAP_TILE_ATTRIBUTION ||
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+
 export type MapPin = {
   id: string;
   name: string;
@@ -107,11 +115,7 @@ export function MapCanvas({
       scrollWheelZoom
       className="h-full w-full"
     >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-        maxZoom={19}
-      />
+      <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_URL} maxZoom={19} />
       <CenterOnFirstFix position={here} />
       <RevealSelected pin={selectedPin} />
       <LocateButton position={here} />
