@@ -1,9 +1,10 @@
 import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { resolveDatabaseUrl } from "../src/lib/database-url";
 import bcrypt from "bcryptjs";
 import { detectReminders } from "../src/lib/reminders";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({ datasourceUrl: resolveDatabaseUrl() });
 
 async function main() {
   const email = "demo@salesparrot.app";
@@ -31,6 +32,8 @@ async function main() {
       phone: "555-201-3344",
       email: "alicia.turner@example.com",
       status: "NEW" as const,
+      latitude: 39.9248,
+      longitude: -83.8095,
       note: "Talked at the door, seemed interested but busy with dinner. Call next week.",
     },
     {
@@ -42,6 +45,8 @@ async function main() {
       phone: "555-482-1190",
       email: "marcus.webb@example.com",
       status: "NOT_HOME" as const,
+      latitude: 39.9241,
+      longitude: -83.8079,
       note: "Not home, no car in driveway. Come back in spring, they mentioned doing yard work then.",
     },
     {
@@ -53,6 +58,8 @@ async function main() {
       phone: "555-773-9081",
       email: "priya.n@example.com",
       status: "INTERESTED" as const,
+      latitude: 39.9255,
+      longitude: -83.8086,
       note: "Very interested, wants a quote. Email her the proposal in 3 days.",
     },
     {
@@ -64,7 +71,35 @@ async function main() {
       phone: "555-664-2210",
       email: null,
       status: "SOLD" as const,
+      latitude: 39.9236,
+      longitude: -83.8101,
       note: "Signed up on the spot! Great conversation about the neighbors' referral program.",
+    },
+    {
+      name: "Ruth Delgado",
+      address: "233 Cedar Ln",
+      city: "Springfield",
+      state: "OH",
+      zip: "45505",
+      phone: "555-330-7712",
+      email: null,
+      status: "APPOINTMENT" as const,
+      latitude: 39.9252,
+      longitude: -83.8071,
+      note: "Wants her husband there too. Set an appointment for next Thursday evening.",
+    },
+    {
+      name: "The Hollis house",
+      address: "88 Sycamore St",
+      city: "Springfield",
+      state: "OH",
+      zip: "45505",
+      phone: null,
+      email: null,
+      status: "NOT_INTERESTED" as const,
+      latitude: 39.9231,
+      longitude: -83.8084,
+      note: "Told me they just signed with someone else. Don't knock again this season.",
     },
   ];
 
@@ -80,6 +115,9 @@ async function main() {
         phone: p.phone,
         email: p.email,
         status: p.status,
+        latitude: p.latitude,
+        longitude: p.longitude,
+        geocodedAt: new Date(),
       },
     });
 

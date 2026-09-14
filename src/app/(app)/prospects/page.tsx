@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { requireCurrentUser } from "@/lib/current-user";
 import { StatusBadge } from "@/components/StatusBadge";
+import { LocateMissingButton } from "@/components/LocateMissingButton";
 import { STATUS_ORDER, type ProspectStatusKey } from "@/lib/status";
 
 export default async function ProspectsPage({
@@ -31,6 +32,10 @@ export default async function ProspectsPage({
     include: { followUps: { where: { status: "PENDING" }, orderBy: { dueAt: "asc" }, take: 1 } },
   });
 
+  const unplacedCount = await prisma.prospect.count({
+    where: { ownerId: user.id, latitude: null },
+  });
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -42,6 +47,8 @@ export default async function ProspectsPage({
           + Add
         </Link>
       </div>
+
+      <LocateMissingButton count={unplacedCount} />
 
       <form className="flex gap-2" action="/prospects">
         <input

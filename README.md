@@ -8,6 +8,10 @@ it's actually time to act.
 
 ## Features
 
+- **Canvassing map** — the screen you actually work from. Every prospect is a
+  pin colored by disposition; tap one to set its status in a single thumb tap,
+  filter the map by status, and drop a new pin at your exact GPS location
+  without typing an address.
 - **Prospects** — track name, address, phone/email, and a sales-pipeline
   status (New, Not Home, Interested, Follow Up, Appointment, Sold, Not
   Interested).
@@ -29,6 +33,8 @@ up yourself.
 
 - [Next.js](https://nextjs.org) (App Router, Server Actions) + TypeScript
 - [Prisma](https://www.prisma.io) + SQLite
+- [Leaflet](https://leafletjs.com) with OpenStreetMap tiles, and
+  [Nominatim](https://nominatim.org) for geocoding — no map API key required
 - Tailwind CSS
 - [chrono-node](https://github.com/wanasit/chrono) for natural-language date
   parsing, plus a small custom parser for seasonal phrases
@@ -56,10 +62,26 @@ Otherwise, use **Create an account** to register your own login.
 
 ### Environment variables
 
-| Variable       | Description                                                                 |
-| -------------- | ----------------------------------------------------------------------------- |
-| `DATABASE_URL` | SQLite connection string. Defaults to `file:./prisma/dev.db`.                 |
-| `AUTH_SECRET`  | Secret used to sign session cookies. Generate one with `openssl rand -hex 32` and never commit it. |
+| Variable               | Description                                                                 |
+| ---------------------- | ----------------------------------------------------------------------------- |
+| `DATABASE_URL`         | SQLite connection string. Defaults to `file:./prisma/dev.db`.                 |
+| `AUTH_SECRET`          | Secret used to sign session cookies. Generate one with `openssl rand -hex 32` and never commit it. |
+| `GEOCODER_URL`         | Optional. Geocoding endpoint, defaults to public Nominatim.                   |
+| `GEOCODER_USER_AGENT`  | Optional. Identifies your app to the geocoder, as Nominatim's policy requires. |
+
+### A note on maps and geocoding
+
+Out of the box this uses the free public OpenStreetMap tile server and
+Nominatim geocoder, so there's no API key to set up. Both have usage policies
+intended for light traffic — Nominatim allows roughly one request per second,
+which the address backfill respects. If you put a real team on this, point
+`GEOCODER_URL` at your own Nominatim instance or a paid geocoder, and use a
+commercial tile provider.
+
+Geocoding is treated as a convenience, never a requirement: if the geocoder is
+unreachable or rate-limited, the prospect still saves, and you can place it by
+dropping a pin from the map. Prospects that couldn't be located show a "Try
+locating them" prompt on the Prospects list.
 
 ## Project structure
 
@@ -67,8 +89,10 @@ Otherwise, use **Create an account** to register your own login.
 prisma/schema.prisma        Data model (User, Prospect, Note, FollowUp)
 prisma/seed.ts               Demo data
 src/lib/reminders.ts         Natural-language + seasonal follow-up detection
+src/lib/geocode.ts           Address <-> coordinate lookup, fails soft
 src/lib/actions/             Server Actions (auth, prospects, notes/follow-ups)
-src/app/(app)/               Authenticated app shell (dashboard, prospects, settings)
+src/app/(app)/               Authenticated app shell (map, dashboard, prospects, settings)
+src/components/map/          Leaflet canvas, disposition sheet, drop-pin sheet
 src/components/              NoteComposer, FollowUpItem, StatusPicker, etc.
 ```
 

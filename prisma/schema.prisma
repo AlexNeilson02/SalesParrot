@@ -60,6 +60,9 @@ model Prospect {
   email     String?
   status    ProspectStatus @default(NEW)
   tags      String? // comma-separated
+  latitude   Float?
+  longitude  Float?
+  geocodedAt DateTime?
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
 
